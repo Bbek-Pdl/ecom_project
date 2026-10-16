@@ -13,6 +13,7 @@ class Category(models.Model):
 
 
 # product with id uuid prmary key and readable sku 
+# discount need to be added with different system like coupon in consideration 
 class Products(models.Model):
     id = models.UUIDField(
         primary_key=True,
@@ -59,6 +60,8 @@ class Products(models.Model):
                                 blank=False)
     created  = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    discount = models.DecimalField(default=0.00,
+                                   decimal_places=2)
 
     def save(self,*args,**kwargs):
         if not self.sku:
