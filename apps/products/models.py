@@ -1,4 +1,4 @@
-
+from apps.user.models import User
 from django.db import models
 from django.utils.text import slugify
 import uuid 
@@ -36,7 +36,7 @@ class Products(models.Model):
                             null=False,
                             blank=False,
                             verbose_name="products_name ")
-    sku = models.CharField(max_length=100,
+    sku = models.CharField(max_length=20,
                            blank=False,
                            null=False,
                            verbose_name="product_identifier",
@@ -54,6 +54,9 @@ class Products(models.Model):
         on_delete=models.PROTECT,
         related_name="products"
     )
+    owner = models.ForeignKey(User,
+                              on_delete=models.CASCADE,
+                              related_name="products")
     active = models.BooleanField(verbose_name="active",
                                  default=False,
                                  null=False,

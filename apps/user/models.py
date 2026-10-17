@@ -16,9 +16,6 @@ class User(AbstractUser):
                                     null=True)
     address = models.CharField(max_length=200)
     email = models.EmailField(unique=True)
-    is_staff = models.BooleanField(default=False,verbose_name="admin")
-    is_superuser = models.BooleanField(default=False)
-
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
 
