@@ -1,7 +1,6 @@
-import pkgutil
-from unicodedata import category
 
 from django.shortcuts import render
+import django_filters
 from .models import Products
 from rest_framework.permissions import IsAuthenticated , IsAdminUser
 from .serializers import ( product_serializer)
@@ -13,6 +12,8 @@ from rest_framework.generics import (ListAPIView,
                                      DestroyAPIView,
                                      RetrieveUpdateDestroyAPIView,
                                      ListCreateAPIView)
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import Products_filter
 
 
 #  1 search by sku or name 
@@ -20,29 +21,9 @@ from rest_framework.generics import (ListAPIView,
 
 class list_create_view(ListCreateAPIView):
     serializer_class = product_serializer
-    def get_queryset(self):
-        
-        queryset = Products.objects.all()
-        query_params = self.request.query_params
-        sku = query_params.get('sku') 
-        name =query_params.get('name')
-        category = query_params.get('category')
-        min_price = query_params.get('min_price')
-        max_price = query_params.get('max_price')
-        if sku:
-            queryset = queryset.filter(sku__iexact = sku)
-        
-        if name:
-            queryset = queryset.filter(name__icontains = name)
-        
-        if category:
-            queryset = queryset.filter(category__icontains = category )
-        
-        if min_price:
-            queryset = queryset.filter(price__gte=min_price)
-        if max_price:
-            queryset = queryset.filter(price__lte=max_price)
-        return queryset
+    queryset = Products.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = Products_filter
 
     def get_permissions(self):
         if self.request.method == 'POST':

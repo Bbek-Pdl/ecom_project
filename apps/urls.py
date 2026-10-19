@@ -1,8 +1,8 @@
 from django.urls import path , include
 
 urlpatterns = [
-    path('cart/',include('cart.urls')),
-    path('products/',include('products.urls')),
-    path('user/',include('user.urls')),
-    path('order/',include('order.urls'))
+    path('cart/',include('apps.cart.urls')),
+    path('products/',include('apps.products.urls')),
+    path('user/',include('apps.user.urls')),
+    path('order/',include('apps.order.urls')),
 ]

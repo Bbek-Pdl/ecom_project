@@ -14,7 +14,8 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Cart_item , Cart
 from .serializers import (carditem_modify,
                           cart_item_Add,
-                          Cart_view_serializer)
+                          Cart_view_serializer,
+                          cart_delete)
 
 class list_cart(ListAPIView):
     serializer_class = Cart_view_serializer
@@ -28,10 +29,17 @@ class cart_create(CreateAPIView):
     serializer_class = cart_item_Add
     permission_classes = [IsAuthenticated]
 
+    
+
 class cart_modify_view(UpdateAPIView):
     serializer_class = carditem_modify
     queryset = Cart_item.objects.all()
+    lookup_field = 'pk'
+
+    
+
 class Cart_items_delete(DestroyAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = cart_delete
     queryset = Cart_item.objects.all()
     

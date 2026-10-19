@@ -4,6 +4,11 @@ import uuid
 from apps.products.models import Products
 # Create your models here.
 
+
+
+
+
+
 class Order(models.Model):
     STATUS_CHOICES = [
     ("pending", "Pending"),
@@ -46,6 +51,68 @@ class Order(models.Model):
     def __str__(self):
         return f"order by {self.user.username} in {self.created_at}"
 
+class Payment(models.Model):
+    PAYMENT_METHOD_CHOICES = [
+        ("esewa", "eSewa"),
+        ("khalti", "Khalti"),
+        ("cod", "Cash on Delivery"),
+        ("card", "Card"),
+    ]
+
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("processing", "Processing"),
+        ("successful", "Successful"),
+        ("failed", "Failed"),
+        ("cancelled", "Cancelled"),
+        ("refunded", "Refunded"),
+    ]
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+
+    order = models.ForeignKey(
+        "Order",
+        on_delete=models.PROTECT,
+        related_name="payments",
+    )
+
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PAYMENT_METHOD_CHOICES,
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending",
+    )
+
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+    )
+
+    currency = models.CharField(
+        max_length=5,
+        default="NPR",
+    )
+
+    transaction_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        unique=True,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+
 
 class Order_items(models.Model):
     order = models.ForeignKey(Order,
@@ -69,7 +136,8 @@ class Order_items(models.Model):
                                    )
     product = models.ForeignKey(Products,
                                 on_delete=models.SET_NULL,
-                                related_name="in_order"
+                                related_name="in_order",
+                                null=True
                                 )
 
     def __str__(self):

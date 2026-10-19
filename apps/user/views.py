@@ -1,3 +1,5 @@
+from rest_framework_simplejwt.exceptions import TokenError
+
 from rest_framework.permissions import (IsAdminUser,
                                         IsAuthenticated)
 from rest_framework.generics import (CreateAPIView ,
@@ -17,11 +19,13 @@ from .models import User
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
+from .permission import IsNotAuthenticated
 # Create your views here.
 
 class user_create_view(CreateAPIView):
     serializer_class = Register_serializer
     queryset = User.objects.all()
+    permission_classes = [IsNotAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -51,8 +55,8 @@ class Profile_View(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 
 
-    def get_queryset(self):
-        return User.objects.filter(id =self.request.user.id)
+    def get_object(self):
+        return self.request.user
 
 class Login_View(GenericAPIView):
     serializer_class = LoginSerializer
@@ -104,16 +108,23 @@ class Change_password(GenericAPIView):
 
 class Logout_View(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = Users_serializer
 
     def post(self,request,*args,**kwargs):
-        refresh_token = request.user.data.get('refresh')
+        refresh_token = request.data.get('refresh')
         if not refresh_token:
             return Response({
                 "error" : " provide refresh token "
             },
             status=status.HTTP_400_BAD_REQUEST)
-        refresh = RefreshToken(refresh_token)
-        refresh.blacklist()
+        try:
+            refresh = RefreshToken(refresh_token)
+            refresh.blacklist()
+        except TokenError:
+            return Response(
+                {"message": "Token is invalid, expired, or already blacklisted"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         return Response({
             "message":"logout sucessfully "
         },

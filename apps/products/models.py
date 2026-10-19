@@ -1,6 +1,6 @@
 from apps.user.models import User
 from django.db import models
-from django.utils.text import slugify
+from django.utils.text import slugify 
 import uuid 
 # Create your models here.
 
@@ -44,15 +44,18 @@ class Products(models.Model):
     description = models.TextField(verbose_name="description")
     price = models.DecimalField(default=0.0,
                                 null=False,
+                                max_digits=10,
                                 decimal_places=2,
                                   blank=False,
                                   verbose_name="price")
     stock = models.IntegerField(default=0,
                                 verbose_name="product_stock")
+    preserve = models.IntegerField(default=0,verbose_name='preserve')
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,
-        related_name="products"
+        related_name="products",
+        null=True
     )
     owner = models.ForeignKey(User,
                               on_delete=models.CASCADE,
@@ -64,14 +67,16 @@ class Products(models.Model):
     created  = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     discount = models.DecimalField(default=0.00,
+                                   max_digits=10,
                                    decimal_places=2)
 
     def save(self,*args,**kwargs):
         if not self.sku:
             prefix = slugify(self.name).replace("-", "")[:3].upper()
             self.sku = f"{prefix}-{uuid.uuid4().hex[:8].upper()}"
-            super().save(self,*args,**kwargs)
-    
+            super().save(*args,**kwargs)
+        super().save(*args,**kwargs)
+
 
     def __str__(self):
         return self.name

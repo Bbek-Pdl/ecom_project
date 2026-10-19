@@ -7,6 +7,8 @@ from .views import ( Users_List,
                     Change_password,
                     Logout_View
                     )
+from rest_framework_simplejwt.views import TokenRefreshView
+
 urlpatterns = [
     path('registration/',user_create_view.as_view()),
     path('login/',Login_View.as_view()),
@@ -15,4 +17,6 @@ urlpatterns = [
     path('login/',user_create_view.as_view()),
     path('change_password',Change_password.as_view()),
     path('Logout/',Logout_View.as_view()),
+    path('refresh/',TokenRefreshView.as_view()),
+
 ]

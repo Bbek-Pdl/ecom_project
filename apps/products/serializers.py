@@ -1,7 +1,7 @@
-from dataclasses import fields
 
 from rest_framework import serializers
-from .models import Products
+from .models import Products ,Category
+from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
 
 
@@ -15,15 +15,38 @@ class product_simp_serializer(serializers.ModelSerializer):
             'price',
             'name'
         ]
-class product_serializer(serializers.ModelSerializer):
 
+
+class CategoryNameField(serializers.Field):
+
+    def to_internal_value(self, data):
+        name = data.strip()
+
+        category = Category.objects.filter(
+            name__iexact=name
+        ).first()
+
+        if category:
+            return category
+
+        return Category.objects.create(
+            name=name,
+            slug=slugify(name)
+        )
+
+    def to_representation(self, value):
+        return value.name
+
+class product_serializer(serializers.ModelSerializer):
+    sku = serializers.CharField(required=False,allow_blank=True,max_length=20)
+    category  = CategoryNameField()
     class Meta:
         model = Products
-        exclude = ['created','updated']
+        exclude = ['created','updated','preserve']
         read_only_fields = ['owner','id']
 
     def update(self, instance, validated_data):
-        validated_data['owner'] = self.context['request'].user
+        
         return super().update(instance, validated_data)
 
     def create(self, validated_data):
@@ -31,13 +54,13 @@ class product_serializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def validate_sku(self,value):
-        if len(value) < 8:
+        if value and len(value) < 8:
             raise ValidationError("minimun sku lenght is 8")
         return value 
         
 
     def validate_name(self,value):
-        if len(value) < 5:
+        if value and len(value) < 5:
             raise ValidationError("unsufficient length of name")
         return value
     
