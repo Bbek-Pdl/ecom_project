@@ -76,6 +76,7 @@ class Cart_view_serializer(serializers.ModelSerializer):
             'user',
             'cart_item',
             'total',
+            
         ]
 
     def get_total(self,obj) -> Decimal:
@@ -83,6 +84,9 @@ class Cart_view_serializer(serializers.ModelSerializer):
             (item.products.price * (1 -  item.products.discount/100) )* item.quantity
             for item in obj.items.all()
         )
+    def validate_cart_item(self,value):
+        print(value)
+
 
 
 class cart_delete(serializers.ModelSerializer):

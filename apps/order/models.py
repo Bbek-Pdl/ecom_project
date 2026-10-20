@@ -1,3 +1,5 @@
+
+
 from django.db import models
 from apps.user.models import User
 import uuid
@@ -33,9 +35,12 @@ class Order(models.Model):
                                        decimal_places=2,
                                        default=0.00)
 
-    total = models.IntegerField(verbose_name="cost_order",
+    total = models.DecimalField(verbose_name="cost_order",
                                 blank=False,
                                 null=False,
+                                default=0.00,
+                                decimal_places=2,
+                                max_digits=12
     )
     shipping_address = models.CharField(max_length=150,
                                         blank=False,
@@ -55,8 +60,6 @@ class Payment(models.Model):
     PAYMENT_METHOD_CHOICES = [
         ("esewa", "eSewa"),
         ("khalti", "Khalti"),
-        ("cod", "Cash on Delivery"),
-        ("card", "Card"),
     ]
 
     STATUS_CHOICES = [
@@ -99,6 +102,7 @@ class Payment(models.Model):
     currency = models.CharField(
         max_length=5,
         default="NPR",
+        
     )
 
     transaction_id = models.CharField(
@@ -111,7 +115,11 @@ class Payment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
+class Reserve(models.Model):
+    Products = models.OneToOneField(Products,
+                                    on_delete=models.CASCADE,
+                                    related_name="reserve")
+    quantity = models.IntegerField(default=0)
 
 
 class Order_items(models.Model):

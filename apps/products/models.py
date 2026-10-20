@@ -74,7 +74,7 @@ class Products(models.Model):
         if not self.sku:
             prefix = slugify(self.name).replace("-", "")[:3].upper()
             self.sku = f"{prefix}-{uuid.uuid4().hex[:8].upper()}"
-            super().save(*args,**kwargs)
+            
         super().save(*args,**kwargs)
 
 

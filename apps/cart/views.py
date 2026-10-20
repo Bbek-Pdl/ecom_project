@@ -23,7 +23,7 @@ class list_cart(ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Cart.objects.filter(user=self.request.user)
+        return Cart.objects.filter(user=self.request.user).prefetch_related("items__products")
 
 class cart_create(CreateAPIView):
     serializer_class = cart_item_Add
@@ -33,13 +33,19 @@ class cart_create(CreateAPIView):
 
 class cart_modify_view(UpdateAPIView):
     serializer_class = carditem_modify
-    queryset = Cart_item.objects.all()
+    permission_classes = [IsAuthenticated]
     lookup_field = 'pk'
+
+    def get_queryset(self):
+        return Cart_item.objects.filter(user=self.request.user).select_related("cart", "products")
 
     
 
 class Cart_items_delete(DestroyAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = cart_delete
-    queryset = Cart_item.objects.all()
+    def get_queryset(self):
+        return Cart_item.objects.filter(
+            cart__user=self.request.user
+        )
     

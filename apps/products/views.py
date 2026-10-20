@@ -21,7 +21,7 @@ from .filters import Products_filter
 
 class list_create_view(ListCreateAPIView):
     serializer_class = product_serializer
-    queryset = Products.objects.all()
+    queryset = Products.objects.select_related("category","owner").all()
     filter_backends = [DjangoFilterBackend]
     filterset_class = Products_filter
 
@@ -33,7 +33,7 @@ class list_create_view(ListCreateAPIView):
 class retrieve_update_destroy_view(RetrieveUpdateDestroyAPIView):
     serializer_class = product_serializer
 
-    queryset = Products.objects.all()    
+    queryset = Products.objects.select_related("owner",'category').all()  
     def get_permissions(self):
             if self.request.method in ['PUT','PATCH','DELETE']:
                 return [IsAdminUser()]

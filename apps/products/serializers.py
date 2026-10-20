@@ -42,7 +42,7 @@ class product_serializer(serializers.ModelSerializer):
     category  = CategoryNameField()
     class Meta:
         model = Products
-        exclude = ['created','updated','preserve']
+        exclude = ['created','updated']
         read_only_fields = ['owner','id']
 
     def update(self, instance, validated_data):
